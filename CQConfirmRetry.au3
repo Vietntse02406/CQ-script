@@ -5,7 +5,7 @@
 _Singleton("CQConfirmRetry.au3", 0)
 
 Global $Struct = DllStructCreate($tagPoint)
-Global $hwnd,$hien=True,$chay=False,$button,$x,$y
+Global $hwnd,$x,$y
 Const $WM_MOUSEMOVE= 0x200
 Const $WM_LBUTTONDOWN   = 0x201
 Const $WM_LBUTTONUP    = 0x202
@@ -23,21 +23,21 @@ Const $MK_RBUTTON = 0x2
 
 HotKeySet("^0","thoat")
 
-While 1
-   If $CmdLine[0] > 0 Then
-	  $hwnd = $CmdLine[1]
-	  loopConfirmRetry()
-   Else
-	  Sleep(1000)
-   EndIf
- WEnd
+If $CmdLine[0] > 0 Then
+	$hwnd = $CmdLine[1]
+	Local $clickCoord[4] = [$CmdLine[2], $CmdLine[3], $CmdLine[4], $CmdLine[5]]
+	loopConfirmRetry($clickCoord)
+Else
+	Sleep(1000)
+EndIf
 
-Func loopConfirmRetry()
+
+Func loopConfirmRetry($clickCoord)
    While(True)
 	  Sleep(3500)
-	  pclick(333, 389)
+	  pclick($clickCoord[0], $clickCoord[1])
 	  Sleep(3500)
-	  pclick(408, 358)
+	  pclick($clickCoord[2], $clickCoord[3])
    Wend
 EndFunc
 

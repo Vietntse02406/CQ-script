@@ -2,10 +2,14 @@
 #include <GUIConstantsEx.au3>
 #include <Math.au3>
 #include <Array.au3>
+#include <Misc.au3>
 
 Global $Struct = DllStructCreate($tagPoint)
-Global $hwnd, $hien = True, $stop = False, $button, $x, $y
-Global $pid ;
+Global $hwnd, $stop = False, $x, $y
+Global $pid
+Global $index = 0
+;						spam     - retry   - confirm
+Global $clickCoord[6] = [531, 430, 408, 358, 333, 389]
 Const $WM_MOUSEMOVE = 0x200
 Const $WM_LBUTTONDOWN = 0x201
 Const $WM_LBUTTONUP = 0x202
@@ -22,9 +26,14 @@ Const $MK_MBUTTON = 0x10
 Const $MK_RBUTTON = 0x2
 
 HotKeySet("^0", "thoat")
-HotKeySet("{NUMPADSUB}", "getwin")
-HotKeySet("{NUMPADMULT}", "pause")
+;HotKeySet("{NUMPADSUB}", "batdau")
+;HotKeySet("{NUMPADMULT}", "pause")
+HotKeySet("^-", "batdau")
+HotKeySet("^=", "pause")
+HotKeySet("{F9}", "setCoord")
 huongdan("Numpad - to Start/Pause, Ctrl 0 to quit!")
+
+
 
 While 1
 	Sleep(1000)
@@ -32,14 +41,18 @@ WEnd
 
 Func batdau()
 	ToolTip("")
+	Pos()
+	$hwnd = _WinAPI_WindowFromPoint($Struct)
+	_WinAPI_ScreenToClient($hwnd, $Struct)
 	;run confirm and retry script
-	$command = '" /AutoIt3ExecuteScript "CQConfirmRetry.au3" ' & $hwnd
+	$command = '" /AutoIt3ExecuteScript "CQConfirmRetry.au3" ' & $hwnd & " " & $clickCoord[2] & " " & $clickCoord[3] & " " & $clickCoord[4] & " " & $clickCoord[5]
 	$pid = Run('"' & @AutoItExe & $command, "", @SW_HIDE)
 	$stop = False
+	$cls=_WinAPI_GetClassName($hwnd)
 
 	While (True)
-		;auto click
-		pclick(531, 430) ;spam block
+		;spam block
+		pclick($clickCoord[0], $clickCoord[1])
 		Sleep(1000)
 		If ($stop) Then
 			ExitLoop
@@ -63,17 +76,13 @@ Func tuclick()
 	pclick($x, $y)
 EndFunc   ;==>tuclick
 
-Func setClickPos()
-
-EndFunc   ;==>setClickPos
-
 ;get default mouse pos -> save to struct
 Func Pos()
 	DllStructSetData($Struct, "x", MouseGetPos(0))
 	DllStructSetData($Struct, "y", MouseGetPos(1))
 EndFunc   ;==>Pos
 
-Func getwin()
+Func setCoord()
 	Pos()
 	;get window
 	$hwnd = _WinAPI_WindowFromPoint($Struct)
@@ -82,10 +91,22 @@ Func getwin()
 	;get x, y from struct, set to global var
 	$x = DllStructGetData($Struct, "x")
 	$y = DllStructGetData($Struct, "y")
+	ConsoleWrite(@CRLF)
+	ConsoleWrite($x & " | " & $y)
+	If $index < 5 Then
+		$clickCoord[$index] = $x
+		$index += 1
+		$clickCoord[$index] = $y
+		$index += 1
+		If $index == 6 Then
+			MsgBox(1, "OK", "Finish setting coord" & @CRLF & "Spam Coord: " & $clickCoord[0] & "-" & $clickCoord[1] & @CRLF & "Confirm Coord: "  & $clickCoord[4] & "-" & $clickCoord[5] & @CRLF & "Retry Coord: " & $clickCoord[2] & "-" & $clickCoord[3])
+		EndIf
+	Else
+		MsgBox(1, "OK", "Finish setting coord" & @CRLF & "Spam Coord: " & $clickCoord[0] & "-" & $clickCoord[1] & @CRLF & "Confirm Coord: "  & $clickCoord[4] & "-" & $clickCoord[5] & @CRLF & "Retry Coord: " & $clickCoord[2] & "-" & $clickCoord[3])
+	EndIf
 	;GUICtrlSetData($tdx,$x)
 	;GUICtrlSetData($tdy,$y)
 	;$cls=_WinAPI_GetClassName($hwnd)
-	batdau()
 EndFunc   ;==>getwin
 
 ;click
