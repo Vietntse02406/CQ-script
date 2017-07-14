@@ -97,6 +97,7 @@ EndFunc   ;==>pclick
 
 ;kill confirm and retry script
 Func killOther()
+	huongdan("Paused! Numpad - to continue!")
 	ProcessClose($pid)
 EndFunc   ;==>killOther
 
