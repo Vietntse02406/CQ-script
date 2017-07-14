@@ -42,6 +42,7 @@ Func batdau()
 		pclick(531, 430) ;spam block
 		Sleep(1000)
 		If ($stop) Then
+			huongdan("Paused! Numpad - to continue!")
 			ExitLoop
 		EndIf
 	WEnd
@@ -97,7 +98,6 @@ EndFunc   ;==>pclick
 
 ;kill confirm and retry script
 Func killOther()
-	huongdan("Paused! Numpad - to continue!")
 	ProcessClose($pid)
 EndFunc   ;==>killOther
 
