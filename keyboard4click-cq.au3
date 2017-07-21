@@ -1,4 +1,5 @@
 #include <GUIConstantsEx.au3>
+#include <WindowsConstants.au3>
 #include <Misc.au3>
 #include <WinAPI.au3>
 #include <Math.au3>
@@ -8,7 +9,6 @@ Opt("GUIOnEventMode", 1)
 
 ; ========== DECLARE VAR SECTION ====================================
 Global $Struct = DllStructCreate($tagPoint)
-$gui = GUICreate("Coord for click", 300, 33)
 Global $hwnd
 
 Global $click1
@@ -17,17 +17,19 @@ Global $click3
 Global $click4
 Global $click5
 
-Const $WM_MOUSEMOVE = 0x200
-Const $WM_LBUTTONDOWN = 0x201
-Const $WM_LBUTTONUP = 0x202
-Const $WM_MBUTTONDOWN = 0x207
-Const $WM_MBUTTONUP = 0x208
-Const $WM_RBUTTONDOWN = 0x204
-Const $WM_RBUTTONUP = 0x205
-Const $WM_NCLBUTTONDOWN = 0xA1
-Const $WM_LBUTTONDBLCLK = 0x203
-Const $WM_MBUTTONDBLCLK = 0x209
-Const $WM_RBUTTONDBLCLK = 0x206
+Global $canRun = False
+
+;~ Const $WM_MOUSEMOVE = 0x200
+;~ Const $WM_LBUTTONDOWN = 0x201
+;~ Const $WM_LBUTTONUP = 0x202
+;~ Const $WM_MBUTTONDOWN = 0x207
+;~ Const $WM_MBUTTONUP = 0x208
+;~ Const $WM_RBUTTONDOWN = 0x204
+;~ Const $WM_RBUTTONUP = 0x205
+;~ Const $WM_NCLBUTTONDOWN = 0xA1
+;~ Const $WM_LBUTTONDBLCLK = 0x203
+;~ Const $WM_MBUTTONDBLCLK = 0x209
+;~ Const $WM_RBUTTONDBLCLK = 0x206
 Const $MK_LBUTTON = 0x1
 Const $MK_MBUTTON = 0x10
 Const $MK_RBUTTON = 0x2
@@ -35,17 +37,31 @@ Const $MK_RBUTTON = 0x2
 
 
 ; ========== GUI SECTION ====================================
+$gui = GUICreate("Coord for click", 302, 63, -1, -1, -1, $WS_EX_TOPMOST)
+
 $bt1 = GUICtrlCreateButton("click 1", 1, 1, 60, 30)
-$bt2 = GUICtrlCreateButton("click 2", 60, 1, 60, 30)
-$bt3 = GUICtrlCreateButton("click 3", 120, 1, 60, 30)
-$bt4 = GUICtrlCreateButton("click 4", 180, 1, 60, 30)
-$bt5 = GUICtrlCreateButton("click 5", 240, 1, 60, 30)
+$bt2 = GUICtrlCreateButton("click 2", 61, 1, 60, 30)
+$bt3 = GUICtrlCreateButton("click 3", 121, 1, 60, 30)
+$bt4 = GUICtrlCreateButton("click 4", 181, 1, 60, 30)
+$bt5 = GUICtrlCreateButton("click 5", 241, 1, 60, 30)
+$btReset = GUICtrlCreateButton("Reset", 121, 32, 60, 30)
+$btOk = GUICtrlCreateButton("Ok", 181, 32, 120, 30)
 
 GUICtrlSetOnEvent($bt1, "clickButtonEvent")
 GUICtrlSetOnEvent($bt2, "clickButtonEvent")
 GUICtrlSetOnEvent($bt3, "clickButtonEvent")
 GUICtrlSetOnEvent($bt4, "clickButtonEvent")
 GUICtrlSetOnEvent($bt5, "clickButtonEvent")
+GUICtrlSetOnEvent($btReset, "resetEvent")
+GUICtrlSetOnEvent($btOk, "okEvent")
+
+GUICtrlSetState($bt1, $GUI_DISABLE)
+GUICtrlSetState($bt2, $GUI_DISABLE)
+GUICtrlSetState($bt3, $GUI_DISABLE)
+GUICtrlSetState($bt4, $GUI_DISABLE)
+GUICtrlSetState($bt5, $GUI_DISABLE)
+GUICtrlSetState($btReset, $GUI_DISABLE)
+GUICtrlSetState($btOk, $GUI_DISABLE)
 
 GUISetOnEvent($GUI_EVENT_CLOSE, "close")
 GUISetOnEvent($GUI_EVENT_MINIMIZE, "mini")
@@ -86,7 +102,6 @@ Func clickButtonEvent()
 		Case $bt1
 			waitForClick()
 			$click1 = setCoord()
-			dd($click1)
 			GUICtrlSetState($bt1, $GUI_DISABLE)
 			toast()
 		Case $bt2
@@ -110,24 +125,44 @@ Func clickButtonEvent()
 			GUICtrlSetState($bt5, $GUI_DISABLE)
 			toast()
 	EndSwitch
+	If Not $canRun Then
+		GuiCtrlSetState($btOk, $GUI_ENABLE)
+	EndIf
 EndFunc   ;==>clickButtonEvent
 
 
+Func resetEvent()
+	GUICtrlSetState($bt1, $GUI_DISABLE)
+	GUICtrlSetState($bt2, $GUI_DISABLE)
+	GUICtrlSetState($bt3, $GUI_DISABLE)
+	GUICtrlSetState($bt4, $GUI_DISABLE)
+	GUICtrlSetState($bt5, $GUI_DISABLE)
+	GUICtrlSetState($btReset, $GUI_DISABLE)
+
+	GUICtrlSetState($btOk, $GUI_DISABLE)
+	$canRun = False
+EndFunc   ;==>resetEvent
+
+
 Func clicker()
-	Local $clickCoord[2]
-	Switch @HotKeyPressed
-		Case "{NUMPAD1}"
-			$clickCoord = $click1
-		Case "{NUMPAD2}"
-			$clickCoord = $click2
-		Case "{NUMPAD3}"
-			$clickCoord = $click3
-		Case "{NUMPAD4}"
-			$clickCoord = $click4
-		Case "{NUMPAD5}"
-			$clickCoord = $click5
-	EndSwitch
-	pclickArray($clickCoord)
+	If $canRun Then
+		Local $clickCoord[2]
+		Switch @HotKeyPressed
+			Case "{NUMPAD1}"
+				$clickCoord = $click1
+			Case "{NUMPAD2}"
+				$clickCoord = $click2
+			Case "{NUMPAD3}"
+				$clickCoord = $click3
+			Case "{NUMPAD4}"
+				$clickCoord = $click4
+			Case "{NUMPAD5}"
+				$clickCoord = $click5
+		EndSwitch
+		pclickArray($clickCoord)
+	Else
+		toast("set coord first")
+	EndIf
 EndFunc   ;==>clicker
 
 
@@ -145,9 +180,20 @@ Func getWin()
 	$hwnd = _WinAPI_WindowFromPoint($Struct)
 	dd($hwnd)
 	toast("get win ok: " & _WinAPI_GetClassName($hwnd))
+	enableCoordSet()
 	;convert default mouse pos to window mouse pos
 	;_WinAPI_ScreenToClient($hwnd, $Struct)
 EndFunc   ;==>getWin
+
+
+Func enableCoordSet()
+	GUICtrlSetState($bt1, $GUI_ENABLE)
+	GUICtrlSetState($bt2, $GUI_ENABLE)
+	GUICtrlSetState($bt3, $GUI_ENABLE)
+	GUICtrlSetState($bt4, $GUI_ENABLE)
+	GUICtrlSetState($bt5, $GUI_ENABLE)
+	GUICtrlSetState($btReset, $GUI_ENABLE)
+EndFunc
 
 
 Func setCoord()
@@ -170,7 +216,7 @@ Func dd($data = "nothing here!")
 	Else
 		ConsoleWrite($data & @CRLF)
 	EndIf
-EndFunc
+EndFunc   ;==>dd
 
 
 Func pclick($x = 0, $y = 0)
@@ -195,4 +241,10 @@ EndFunc   ;==>close
 Func mini()
 	GUISetState(@SW_MINIMIZE)
 EndFunc   ;==>mini
+
+
+Func okEvent()
+	$canRun = True
+	GUISetState(@SW_HIDE)
+EndFunc   ;==>okEvent
 ; ========== END FUNCTION SECTION ====================================
