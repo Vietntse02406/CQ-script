@@ -41,6 +41,7 @@ Func batdau()
 		;auto click
 		pclick(531, 430) ;spam block
 		Sleep(1000)
+		outOfMeat()
 		If ($stop) Then
 			huongdan("Paused! Numpad - to continue!")
 			ExitLoop
@@ -55,6 +56,12 @@ Func batdau()
 ;~    EndIf
 EndFunc   ;==>batdau
 
+Func outOfMeat()
+	;check gem color, if same stop
+	$color = PixelGetColor(542, 788, $hwnd)
+	If $color == 3392511 Then pause()
+EndFunc
+
 
 Func huongdan($string)
 	ToolTip($string, 666, 5)
@@ -63,10 +70,6 @@ EndFunc   ;==>huongdan
 Func tuclick()
 	pclick($x, $y)
 EndFunc   ;==>tuclick
-
-Func setClickPos()
-
-EndFunc   ;==>setClickPos
 
 ;get default mouse pos -> save to struct
 Func Pos()

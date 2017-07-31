@@ -37,9 +37,19 @@ Func loopConfirmRetry()
 	  Sleep(3500)
 	  pclick(333, 389)
 	  Sleep(3500)
-	  pclick(408, 358)
+	  outOfMeat()
+	  ToolTip("fail vcl", 666, 5)
+	  ;pclick(408, 358)
    Wend
 EndFunc
+
+
+Func outOfMeat()
+	;check gem color, if same stop
+	$color = PixelGetColor(542, 788, $hwnd)
+	If $color == 3392511 Then quit()
+EndFunc
+
 
 Func tuclick()
    pclick($x, $y)
@@ -56,6 +66,6 @@ Func pclick($x=0,$y=0)
    _WinAPI_PostMessage($hwnd, $WM_LBUTTONUP, 0,$lParam)
 EndFunc
 
-Func thoat()
+Func quit()
    Exit
 EndFunc
