@@ -38,8 +38,7 @@ Func loopConfirmRetry()
 	  pclick(333, 389)
 	  Sleep(3500)
 	  outOfMeat()
-	  ToolTip("fail vcl", 666, 5)
-	  ;pclick(408, 358)
+	  pclick(408, 358)
    Wend
 EndFunc
 
